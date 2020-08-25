@@ -1,0 +1,185 @@
+= Thread::Task
+
+さらにもうひとつの並列処理を簡単に記述するための Thread クラスのラッパーライブラリ.
+
+== 特徴
+
+* Thread::Task は並列処理でよく使う構成を簡潔に記述できるようにしたもの.
+* Thread::Pool は Thread::Task の同時実行数を制限する.
+* Kernel#future メソッドを使うと、非同期処理を簡潔に記述できる。
+
+== 導入
+
+アプリの Gemfile にこの行を追加
+
+[source,ruby]
+----
+gem 'thread-task'
+----
+
+それから実行
+
+    $ bundle install
+
+または次のように手動で導入
+
+    $ gem install thread-task
+    or
+    $ gem install -l thread-task-x.x.x.gem
+
+== 使い方
+
+=== 並列実行を開始して完了を待って結果を得る.
+
+[source,ruby]
+----
+require  "thread/task"
+
+task  =  ::Thread::Task.new do
+  sleep  2
+  Time.now
+end
+p task.value
+----
+
+=== 簡素な表現.
+
+[source,ruby]
+----
+require  "thread/task/future"
+
+task  =  future do
+  sleep  2
+  Time.now
+end
+p task.value
+----
+
+=== 並列実行の最大数を制限する.
+
+[source,ruby]
+----
+require  "thread/task/future"
+
+pool  =  ::Thread::Pool.new(3)
+
+tasks  =  (0...10).map do |ndx|
+  future(pool) do
+    p ["-->", ndx]
+    sleep( rand * 2 )
+    p ["<--", ndx]
+  end
+end
+
+tasks.each(&:join)
+----
+
+== リファレンス
+
+=== 新たな Thread::Task を作成する.
+
+[source,ruby]
+----
+Thread::Task.new( pool = nil, &block )
+Kernel#future( pool = nil, &block )
+----
+
+Kernel#future メソッドは require "thread/task/future" で利用可能になる.
+
+* Result:
+  ** Thread::Task オブジェクト.
+
+* Parameter:
+  ** pool: Thread::Pool オブジェクト. (default: nil)
+  ** block: コールバック動作.
+
+* Block Parameter:
+  ** なし.
+
+=== スレッド停止を待つ. スレッドの例外を無視する.
+
+[source,ruby]
+----
+Thread::Task#join
+----
+
+* Result:
+  ** nil
+
+* Parameter:
+  ** なし.
+
+=== スレッド停止を待って結果を得る. スレッドの例外を検出する.
+
+[source,ruby]
+----
+Thread::Task#value
+----
+
+* Result:
+  ** ブロックの実行結果.
+
+* Parameter:
+  ** なし.
+
+=== スレッドの実行を取り消す.
+
+[source,ruby]
+----
+Thread::Task#cancel
+----
+
+* Result:
+  ** nil.
+
+* Parameter:
+  ** なし.
+
+=== 新たな Thread::Pool を作成する.
+
+[source,ruby]
+----
+Thread::Pool.new( count )
+----
+
+* Result:
+  ** Thread::Pool オブジェクト.
+
+* Parameter:
+  ** count: 並列実行の最大数.
+
+=== リソースをプールから取得する.
+
+[source,ruby]
+----
+Thread::Pool#acquire
+----
+
+* Result:
+  ** nil.
+
+* Parameter:
+  ** なし.
+
+=== リソースをプールに解放する.
+
+[source,ruby]
+----
+Thread::Pool#release
+----
+
+* Result:
+  ** nil.
+
+* Parameter:
+  ** なし.
+
+== 貢献
+
+不具合報告とプルリクエストは GitHub https://github.com/arimay/thread-task まで. 
+
+== ライセンス
+
+この Gem は、 http://opensource.org/licenses/MIT[MITライセンス] の条件に基づいてオープンソースとして入手できる.
+
+Copyright (c) ARIMA Yasuhiro <arima.yasuhiro@gmail.com>

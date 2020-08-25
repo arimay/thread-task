@@ -1,0 +1,185 @@
+= Thread::Task
+
+Yet another, a wrapper library of Thread class for easily describing parallel processing.
+
+== Features
+
+* Thread::Task is a configuration that allows you to briefly describe the configuration often used in parallel processing.
+* Thread::Pool limits the number of parallel executions of Thread::Task.
+* Using Kernel#future method, asynchronous process can be described simply.
+
+== Installation
+
+Add this line to your application's Gemfile:
+
+[source,ruby]
+----
+gem 'thread-task'
+----
+
+And then execute:
+
+    $ bundle install
+
+Or install it yourself as:
+
+    $ gem install thread-task
+    or
+    $ gem install -l thread-task-x.x.x.gem
+
+== Usage
+
+=== Start parallel execution, wait for completion and get result.
+
+[source,ruby]
+----
+require  "thread/task"
+
+task  =  ::Thread::Task.new do
+  sleep  2
+  Time.now
+end
+p task.value
+----
+
+=== Simple expression.
+
+[source,ruby]
+----
+require  "thread/task/future"
+
+task  =  future do
+  sleep  2
+  Time.now
+end
+p task.value
+----
+
+=== Limit the max count of parallel executions.
+
+[source,ruby]
+----
+require  "thread/task/future"
+
+pool  =  ::Thread::Pool.new(3)
+
+tasks  =  (0...10).map do |ndx|
+  future(pool) do
+    p ["-->", ndx]
+    sleep( rand * 2 )
+    p ["<--", ndx]
+  end
+end
+
+tasks.each(&:join)
+----
+
+== Reference
+
+=== Create a new Thread::Task.
+
+[source,ruby]
+----
+Thread::Task.new( pool = nil, &block )
+Kernel#future( pool = nil, &block )
+----
+
+Kernel#future method can be used with require "thread/task/future".
+
+* Result:
+  ** Thread::Task object.
+
+* Parameter:
+  ** pool: Thread::Pool object. (default: nil)
+  ** block: callback action.
+
+* Block Parameter:
+  ** none.
+
+=== Wait for thread stop. Ignore thread exceptions.
+
+[source,ruby]
+----
+Thread::Task#join
+----
+
+* Result:
+  ** nil
+
+* Parameter:
+  ** none.
+
+=== Wait for the thread to stop and get the result. Detect the thread exception.
+
+[source,ruby]
+----
+Thread::Task#value
+----
+
+* Result:
+  ** The execution result of the block.
+
+* Parameter:
+  ** none.
+
+=== Cancel the execution of the thread.
+
+[source,ruby]
+----
+Thread::Task#cancel
+----
+
+* Result:
+  ** nil.
+
+* Parameter:
+  ** none.
+
+=== Create a new Thread::Pool.
+
+[source,ruby]
+----
+Thread::Pool.new( count )
+----
+
+* Result:
+  ** Thread::Pool object.
+
+* Parameter:
+  ** count: Max count of parallel executions.
+
+=== Acquire a resource from pool.
+
+[source,ruby]
+----
+Thread::Pool#acquire
+----
+
+* Result:
+  ** nil.
+
+* Parameter:
+  ** none.
+
+=== Release a resource to pool.
+
+[source,ruby]
+----
+Thread::Pool#release
+----
+
+* Result:
+  ** nil.
+
+* Parameter:
+  ** none.
+
+== Contributing
+
+Bug reports and pull requests are welcome on GitHub at https://github.com/arimay/thread-task.
+
+== License
+
+The gem is available as open source under the terms of the http://opensource.org/licenses/MIT[MIT License].
+
+Copyright (c) ARIMA Yasuhiro <arima.yasuhiro@gmail.com>
