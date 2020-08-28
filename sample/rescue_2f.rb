@@ -2,8 +2,8 @@
 require "thread/task/future"
 
 begin
-  pool  =  ::Thread::Pool.new(1)
-  task  =  future(pool) do
+  pool  =  ::Thread::Pool.new( 1 )
+  task  =  future( pool: pool ) do
     sleep  1
     raise  "die now"
   end

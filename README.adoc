@@ -63,11 +63,11 @@ require  "thread/task/future"
 
 pool  =  ::Thread::Pool.new(3)
 
-tasks  =  (0...10).map do |ndx|
-  future(pool) do
-    p ["-->", ndx]
+tasks  =  (0...10).map do |i|
+  future( i, pool: pool ) do |j|
+    p ["-->", j]
     sleep( rand * 2 )
-    p ["<--", ndx]
+    p ["<--", j]
   end
 end
 
@@ -80,8 +80,8 @@ tasks.each(&:join)
 
 [source,ruby]
 ----
-Thread::Task.new( pool = nil, &block )
-Kernel#future( pool = nil, &block )
+Thread::Task.new( *args, pool: nil, &block )
+Kernel#future( *args, pool: nil, &block )
 ----
 
 Kernel#future method can be used with require "thread/task/future".
@@ -90,11 +90,12 @@ Kernel#future method can be used with require "thread/task/future".
   ** Thread::Task object.
 
 * Parameter:
+  ** args: Pass args as is to the block.
   ** pool: Thread::Pool object. (default: nil)
   ** block: callback action.
 
 * Block Parameter:
-  ** none.
+  ** args: Treat args as local variables specific to that thread.
 
 === Wait for thread stop. Ignore thread exceptions.
 

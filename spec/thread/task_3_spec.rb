@@ -2,10 +2,11 @@ require "thread/task/future"
 
 RSpec.describe Thread::Pool do
 
-  it ".new     time order 1" do
+  it "Task.new       time order 1" do
     pool  =  ::Thread::Pool.new(3)
-    tasks  =  (0...10).map do |ndx|
-      Thread::Task.new(pool) do
+    tasks  =  (0...10).map do |i|
+      Thread::Task.new( i, pool: pool ) do |j|
+        expect( i ).to be == j
         expect( pool.rest ).to be >= 0
         expect( pool.rest ).to be <= 3
         sleep( rand * 2 )
@@ -21,10 +22,11 @@ RSpec.describe Thread::Pool do
     end
   end
 
-  it "#future  time order 2" do
+  it "Kernel#future  time order 2" do
     pool  =  ::Thread::Pool.new(3)
-    tasks  =  (0...10).map do |ndx|
-      future(pool) do
+    tasks  =  (0...10).map do |i|
+      future( i, pool: pool ) do |j|
+        expect( i ).to be == j
         expect( pool.rest ).to be >= 0
         expect( pool.rest ).to be <= 3
         sleep( rand * 2 )

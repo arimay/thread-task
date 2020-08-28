@@ -2,8 +2,8 @@ require "thread/task/version"
 require "thread/task/base"
 
 module ::Kernel
-  def future( pool = nil, &block )
-    ::Thread::Task.new( pool, &block )
+  def future( *args, pool: nil, &block )
+    ::Thread::Task.new( *args, pool: pool, &block )
   end
 end
 

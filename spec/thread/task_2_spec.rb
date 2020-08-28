@@ -2,7 +2,7 @@ require "thread/task/future"
 
 RSpec.describe Thread::Task do
 
-  it ".new     time order 1" do
+  it "Task.new       time order 1" do
     time1  =  Time.now
     time2  =  nil
     time3  =  nil
@@ -21,7 +21,7 @@ RSpec.describe Thread::Task do
     expect( time3 ).to be == time4
   end
 
-  it "#future  time order 2" do
+  it "kernel#future  time order 2" do
     time1  =  Time.now
     time2  =  nil
     time3  =  nil

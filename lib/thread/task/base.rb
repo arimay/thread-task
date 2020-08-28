@@ -3,24 +3,29 @@ require 'monitor'
 class ::Thread
 
   class Task < ::BasicObject
-    def initialize( pool = nil, &block )
+    def initialize( *args, pool: nil, &block )
       raise  ::ArgumentError, "block required."    if block.nil?
 
-      if pool.nil?
-        @thread  =  ::Thread.start do
+      if  pool.nil?
+        @thread  =  ::Thread.start( args ) do |args|
           ::Thread.current.report_on_exception  =  false
-          block.call
+          block.call( *args )
         end
-      else
-        @thread  =  ::Thread.start do
+
+      elsif  pool.is_a? ::Thread::Pool
+        @thread  =  ::Thread.start( args ) do |args|
           ::Thread.current.report_on_exception  =  false
           pool.acquire
           begin
-            block.call
+            block.call( *args )
           ensure
             pool.release
           end
         end
+
+      else
+        raise  ::ArgumentError, "Nil or Thread::Pool object expected."
+
       end
     end
 

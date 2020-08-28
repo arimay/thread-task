@@ -63,11 +63,11 @@ require  "thread/task/future"
 
 pool  =  ::Thread::Pool.new(3)
 
-tasks  =  (0...10).map do |ndx|
-  future(pool) do
-    p ["-->", ndx]
+tasks  =  (0...10).map do |i|
+  future( i, pool: pool ) do |j|
+    p ["-->", j]
     sleep( rand * 2 )
-    p ["<--", ndx]
+    p ["<--", j]
   end
 end
 
@@ -80,8 +80,8 @@ tasks.each(&:join)
 
 [source,ruby]
 ----
-Thread::Task.new( pool = nil, &block )
-Kernel#future( pool = nil, &block )
+Thread::Task.new( *args, pool: nil, &block )
+Kernel#future( *args, pool: nil, &block )
 ----
 
 Kernel#future メソッドは require "thread/task/future" で利用可能になる.
@@ -90,11 +90,12 @@ Kernel#future メソッドは require "thread/task/future" で利用可能にな
   ** Thread::Task オブジェクト.
 
 * Parameter:
+  ** args: args をはそのままブロックに渡す.
   ** pool: Thread::Pool オブジェクト. (default: nil)
   ** block: コールバック動作.
 
 * Block Parameter:
-  ** なし.
+  ** args: args をそのスレッド固有のローカル変数として扱う.
 
 === スレッド停止を待つ. スレッドの例外を無視する.
 
